@@ -30,11 +30,17 @@ public class InputManager : MonoBehaviour
     {
         commands.Add("go");
         commands.Add("get");
-        userInput.onEndEdit.AddListener(UpdateStory);
+        userInput.onEndEdit.AddListener(GetInput);
         story = storyText.text;
     }
 
     public void UpdateStory(string msg)
+    {
+        story += "\n" + msg;
+        storyText.text = story;
+    }
+
+    void GetInput(string msg)
     {
         if (msg != "")
         {
@@ -43,12 +49,31 @@ public class InputManager : MonoBehaviour
 
             if (commands.Contains(parts[0]))
             {
-                story += "\n" + msg;
-                storyText.text = story;
+                if (parts[0] == "go")
+                {
+                    if(NavigationManager.instance.SwitchRooms(parts[1]))
+                    {
+                        
+                    }
+                    else
+                    {
+                        UpdateStory("There is no exit in that direction.");
+                    }
+                }
+                else if(parts[0] == "get")
+                {
+                    if(NavigationManager.instance.TakeItem(parts[1]))
+                    {
+                        GameManager.instance.inventory.Add(parts[1]);
+                        UpdateStory("You picked up the " + parts[1]);
+                    }
+                    else
+                    {
+                        UpdateStory("Sorry, " + parts[1] + " is not here.");
+                    }  
+                }
             }
         }
-        story += "\n" + msg;
-        storyText.text = story;
         userInput.text = "";
         userInput.ActivateInputField();
     }
