@@ -20,6 +20,11 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+       InputManager.instance.OnRestart += RestartGame;
+    }
+
+    void RestartGame()
+    {
+        inventory.Clear();
     }
 }
