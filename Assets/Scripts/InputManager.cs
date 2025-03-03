@@ -13,6 +13,10 @@ public class InputManager : MonoBehaviour
     public Text inputText; // part of the input field where user enters response
     public Text placeHolderText; // part of the input field for initial placeholder text
     //public Button abutton;
+
+    //1st step to creating and using delegate
+    public delegate void Restart(); //create delegate
+    public event Restart onRestart; //create event
     
     private string story; // holds the story to display
     private List<string> commands = new List<string>(); //valid user commands
@@ -31,6 +35,7 @@ public class InputManager : MonoBehaviour
     {
         commands.Add("go");
         commands.Add("get");
+        commands.Add("restart");  // added to work with delegate example
 
         userInput.onEndEdit.AddListener(GetInput); //now calls GetInput
         //abutton.onClick.AddListener(DoSomething);
@@ -65,7 +70,8 @@ public class InputManager : MonoBehaviour
                     }
                     else
                     {
-                        UpdateStory("Exit does not exist. Try again.");
+                        // added the "is locked" response
+                        UpdateStory("Exit does not exist or is locked. Try again.");
                     }
                 }
                 else if(parts[0] == "get") //wants to add item to inventory
@@ -79,6 +85,11 @@ public class InputManager : MonoBehaviour
                     {
                         UpdateStory("Sorry, " + parts[1] + " does not exist in this room.");
                     }
+                }
+                else if(parts[0] == "restart")
+                {
+                    if (onRestart != null) // if anyone is listening
+                        onRestart(); //invoke the event
                 }
             }
         }
