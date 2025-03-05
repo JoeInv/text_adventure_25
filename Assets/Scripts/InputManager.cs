@@ -36,10 +36,17 @@ public class InputManager : MonoBehaviour
         commands.Add("go");
         commands.Add("get");
         commands.Add("restart");  // added to work with delegate example
+        commands.Add("save");
 
         userInput.onEndEdit.AddListener(GetInput); //now calls GetInput
         //abutton.onClick.AddListener(DoSomething);
         story = storyText.text;
+        NavigationManager.instance.onGameOver += EndGame; //function to call when event occurs
+    }
+
+    void EndGame() //function to respond to the event
+    {
+        UpdateStory("\nPlease enter 'restart' to play again. ");
     }
 
     //void DoSomething() //event handler
@@ -90,6 +97,10 @@ public class InputManager : MonoBehaviour
                 {
                     if (onRestart != null) // if anyone is listening
                         onRestart(); //invoke the event
+                }
+                else if (parts[0] == "save")
+                {
+                    GameManager.instance.Save();
                 }
             }
         }
