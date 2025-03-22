@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         Load();
     }
 
-    void Load()
+    void Load() 
     {
         if(File.Exists(Application.persistentDataPath + "/player.save")) //Existing player
         {
@@ -40,6 +40,10 @@ public class GameManager : MonoBehaviour
             {
                 NavigationManager.instance.SwitchRooms(room);
             }
+            inventory.Clear();
+            if (playerData.inventory != null)
+                inventory.AddRange(playerData.inventory);
+            
         }
         else //New player!!!
         {
@@ -57,6 +61,7 @@ public class GameManager : MonoBehaviour
         //set up data to save
         SaveState playerState = new SaveState();
         playerState.currentRoom = NavigationManager.instance.currentRoom.name;
+        playerState.inventory = new List<string>(inventory);
 
         BinaryFormatter bf = new BinaryFormatter();
         FileStream afile = File.Create(Application.persistentDataPath + "/player.save");

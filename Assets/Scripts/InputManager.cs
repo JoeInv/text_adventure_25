@@ -35,6 +35,8 @@ public class InputManager : MonoBehaviour
     {
         commands.Add("go");
         commands.Add("get");
+        commands.Add("commands");
+        commands.Add("inventory");
         commands.Add("restart");  // added to work with delegate example
         commands.Add("save");
 
@@ -101,6 +103,16 @@ public class InputManager : MonoBehaviour
                 else if (parts[0] == "save")
                 {
                     GameManager.instance.Save();
+                }
+                else if (parts[0] == "inventory")
+                {
+                    string currentInv = string.Join(", ", GameManager.instance.inventory);
+                    UpdateStory("Inventory: " + currentInv);
+                }
+                else if (parts[0] == "commands")
+                {
+                    string listoCommands = string.Join (", ", commands);
+                    UpdateStory("Commands: " + listoCommands);
                 }
             }
         }

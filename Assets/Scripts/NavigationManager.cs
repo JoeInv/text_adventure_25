@@ -15,6 +15,8 @@ public class NavigationManager : MonoBehaviour
     public event GameOver onGameOver;
 
     public Exit toKeyNorth; //needed to turn exit to visible from hidden
+    public Exit toSmokeyWest;
+    public Exit toDecisionEast;
 
     private Dictionary<string, Room> exitRooms = new Dictionary<string, Room>();
 
@@ -41,6 +43,8 @@ public class NavigationManager : MonoBehaviour
     public void ResetGame()
     {
         toKeyNorth.isHidden = true;
+        toSmokeyWest.isHidden = true;
+        toDecisionEast.isHidden = true;
         currentRoom = startingRoom;
         Unpack();
     }
@@ -49,7 +53,7 @@ public class NavigationManager : MonoBehaviour
     {
         string description = currentRoom.description;
         exitRooms.Clear(); //reset for next room
-        foreach(Exit e in currentRoom.exits)
+        foreach (Exit e in currentRoom.exits)
         {
             if (!e.isHidden)
             {
@@ -60,8 +64,47 @@ public class NavigationManager : MonoBehaviour
 
         InputManager.instance.UpdateStory(description);
         if (exitRooms.Count == 0)
-            if(onGameOver != null) //is anyone listening
-                onGameOver(); //invoking the event
+            if (onGameOver != null) //is anyone listening
+                if (GameManager.instance.inventory.Contains("amulet"))
+                {
+                    if (currentRoom.roomName != "win")
+                    {
+                        GameManager.instance.inventory.Remove("amulet");
+                        GameManager.instance.inventory.Add("broken amulet");
+                        InputManager.instance.UpdateStory("The amulet seems to have saved your life, but has broken in the process.");
+                        if (currentRoom.roomName == "dragon")
+                        {
+                            //Debug.Log("unlocked");
+                            toSmokeyWest.isHidden = false;
+                            foreach (Exit e in currentRoom.exits)
+                            {
+                                if (!e.isHidden)
+                                {
+                                    description += " " + e.description;
+                                    exitRooms.Add(e.direction.ToString(), e.room);
+                                }
+                            }
+                            InputManager.instance.UpdateStory("A door has opened to the west. Escape while you can!");
+                        }
+                        else if (currentRoom.roomName == "trap")
+                        {
+                            //Debug.Log("unlocked");
+                            toDecisionEast.isHidden = false; exitRooms.Clear(); //reset for next room
+                            foreach (Exit e in currentRoom.exits)
+                            {
+                                if (!e.isHidden)
+                                {
+                                    description += " " + e.description;
+                                    exitRooms.Add(e.direction.ToString(), e.room);
+                                }
+                            }
+                            InputManager.instance.UpdateStory("A door has opened to the east. Escape while you can!");
+                            
+                        }
+                    }
+                    else
+                        onGameOver(); //invoking the event
+                }
     }
 
     public bool SwitchRooms(string direction)
@@ -106,6 +149,8 @@ public class NavigationManager : MonoBehaviour
             toKeyNorth.isHidden = false;
             return true;
         }
+        else if (item == "amulet" && currentRoom.hasAmulet)
+            return true;
         else
             return false;
     }
@@ -120,4 +165,5 @@ public class NavigationManager : MonoBehaviour
 
         return null;
     }
+
 }
